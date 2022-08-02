@@ -4,12 +4,12 @@ import menu from './menu.js';
 // reply on /menu with empty json object
 const app = express();
 
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.json({ message: "Hi, I'm a shitty API!" });
 });
 
-app.get('/menu', (req, res) => {
-  res.json(menu);
+app.get('/menu', (_, res) => {
+  res.json({ menu });
 });
 
 // boot
