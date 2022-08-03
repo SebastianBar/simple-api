@@ -2,7 +2,8 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
 
-import { getMenu } from './routes.js';
+import { getMenu, getOrders, postOrder } from './routes.js';
+import { sequelize } from './db/index.js';
 
 const app = express();
 
@@ -23,8 +24,11 @@ app.get('/', (_, res) => {
   res.redirect('/api-docs');
 });
 app.get('/menu', getMenu);
+app.get('/orders', getOrders);
+app.post('/orders', postOrder);
 
 // boot
 app.listen(3000, () => {
   console.log('listening on port 3000');
+  sequelize.sync();
 });
