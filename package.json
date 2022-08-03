@@ -11,6 +11,8 @@
   "author": "Sebastian Barrenechea",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "swagger-jsdoc": "^6.2.2",
+    "swagger-ui-express": "^4.5.0"
   }
 }

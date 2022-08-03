@@ -1,9 +1,14 @@
 import menu from './menu.js';
 
-export const getRoot = (_, res) => {
-  res.json({ message: "Hi, I'm a shitty API!" });
-};
-
+/**
+ * @openapi
+ * /menu:
+ *   get:
+ *     description: Returns the restaurant's menu.
+ *     responses:
+ *       200:
+ *         description: Returns a mysterious string.
+ */
 export const getMenu = (_, res) => {
   res.json({ menu });
 };
