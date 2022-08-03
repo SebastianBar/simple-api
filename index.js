@@ -6,6 +6,7 @@ import { getMenu, getOrders, postOrder } from './routes.js';
 import { sequelize } from './db/index.js';
 
 const app = express();
+app.use(express.json());
 
 const options = {
   definition: {

@@ -36,9 +36,37 @@ export const getOrders = async (_, res) => {
  * /orders:
  *   post:
  *     description: Creates a new order
+ *     requestBody:
+ *      content:
+ *       application/json:
+ *        schema:
+ *         properties:
+ *          table:
+ *           type: string
+ *           description: The table number
+ *          customer:
+ *           type: string
+ *           description: The customer's name
+ *          items:
+ *           type: array
+ *           items:
+ *            type: object
+ *            properties:
+ *             id:
+ *              type: string
+ *              description: One of the menu items' id
+ *             quantity:
+ *              type: integer
+ *              description: The quantity of the item
+ *         required:
+ *         - table
+ *         - customer
+ *         - items
  *     responses:
- *       200:
+ *       201:
  *         description: An order has been created.
+ *       500:
+ *         description: Something catastrophic has happened.
  */
 export const postOrder = async (req, res) => {
   const payload = req.body;
@@ -48,7 +76,7 @@ export const postOrder = async (req, res) => {
       status: 'pending'
     });
 
-    res.json({ order });
+    res.status(201).json({ order });
   } catch (err) {
     res.status(500).json({ err });
   }
