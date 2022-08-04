@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "./index.js";
 
-export const Order = sequelize.define("Order", {
+const Order = sequelize.define("Order", {
   // Model attributes are defined here
   table: {
     type: DataTypes.STRING,
@@ -21,3 +21,5 @@ export const Order = sequelize.define("Order", {
     defaultValue: "pending"
   }
 });
+
+export default Order;

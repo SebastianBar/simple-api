@@ -9,4 +9,4 @@ USER node
 COPY --chown=node:node . .
 COPY --from=installer --chown=node:node /app/node_modules ./node_modules
 
-CMD ["node", "index.js"]
+CMD ["node", "src/index.js"]

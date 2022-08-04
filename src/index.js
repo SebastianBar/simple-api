@@ -3,7 +3,7 @@ import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
 
-import { getMenu, getOrders, postOrder } from './routes.js';
+import { wrapRoutes } from './routes.js';
 import { sequelize } from './db/index.js';
 
 const corsOptions = {
@@ -23,7 +23,7 @@ const options = {
       version: '1.0.0',
     },
   },
-  apis: ['./routes.js']
+  apis: ['./src/routes.js']
 };
 
 const swaggerSpec = swaggerJSDoc(options);
@@ -31,12 +31,21 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get('/', (_, res) => {
   res.redirect('/api-docs');
 });
-app.get('/menu', getMenu);
-app.get('/orders', getOrders);
-app.post('/orders', postOrder);
+wrapRoutes(app);
 
 // boot
-app.listen(3000, () => {
+const server = app.listen(3000, () => {
   console.log('listening on port 3000');
   sequelize.sync();
 });
+
+const gracefulShutdown = () => {
+  console.info('shutdown signal received, shutting down gracefully');
+  server.close(() => {
+    console.info('server has been shutdown');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);

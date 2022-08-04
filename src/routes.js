@@ -1,5 +1,5 @@
 import menu from './menu.js';
-import { Order } from './db/Order.js';
+import Order from './db/Order.js';
 
 /**
  * @openapi
@@ -10,7 +10,7 @@ import { Order } from './db/Order.js';
  *       200:
  *         description: Returns a mysterious string.
  */
-export const getMenu = (_, res) => {
+const getMenu = (_, res) => {
   res.json({ menu });
 };
 
@@ -23,13 +23,11 @@ export const getMenu = (_, res) => {
  *       200:
  *         description: Returns an array of orders.
  */
-export const getOrders = async (_, res) => {
+const getOrders = async (_, res) => {
   const orders = await Order.findAll();
 
   res.json({ orders });
 };
-
-
 
 /**
  * @openapi
@@ -68,7 +66,7 @@ export const getOrders = async (_, res) => {
  *       500:
  *         description: Something catastrophic has happened.
  */
-export const postOrder = async (req, res) => {
+const postOrder = async (req, res) => {
   const payload = req.body;
   try {
     const order = await Order.create({
@@ -81,3 +79,9 @@ export const postOrder = async (req, res) => {
     res.status(500).json({ err });
   }
 };
+
+export const wrapRoutes = (express) => {
+  express.get('/menu', getMenu);
+  express.get('/orders', getOrders);
+  express.post('/orders', postOrder);
+}
