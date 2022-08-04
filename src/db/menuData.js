@@ -58,21 +58,21 @@ export default [
   {
     title: "Mineral water",
     img: "https://images.unsplash.com/photo-1626810333910-c4a297aff6ab?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=435&q=80",
-    description: "",
+    description: "Mineral water, from the tap",
     price: 2.50,
     type: "drinks"
   },
   {
     title: "English apple juice",
     img: "https://images.unsplash.com/photo-1605199910378-edb0c0709ab4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
-    description: "",
+    description: "The fancies of the English",
     price: 3.50,
     type: "drinks"
   },
   {
     title: "English lemonade",
     img: "https://images.unsplash.com/photo-1563572912886-754e26f4c4b6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=327&q=80",
-    description: "",
+    description: "Just the right amount of lemons",
     price: 3.75,
     type: "drinks"
   },
@@ -80,21 +80,21 @@ export default [
   {
     title: "Floral chamomile tea",
     img: "https://images.unsplash.com/photo-1593487806527-40dcc19864bd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=435&q=80",
-    description: "",
+    description: "Tea, just tea. No sugar.",
     price: 5.50,
     type: "drinks"
   },
   {
     title: "Americano",
     img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
-    description: "",
+    description: "Espresso with hot water",
     price: 3.50,
     type: "drinks"
   },
   {
     title: "Sweet dreams latte",
     img: "https://images.unsplash.com/photo-1623193893875-b74cfcd406b2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
-    description: "",
+    description: "Stirred with a little sugar-free chancaca",
     price: 5.75,
     type: "drinks"
   },
