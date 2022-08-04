@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import { Order, MenuItem } from './db/sequelize.js';
+import { prisma } from './db/prisma.js';
 
 /**
  * @openapi
@@ -11,7 +11,7 @@ import { Order, MenuItem } from './db/sequelize.js';
  *         description: Returns a mysterious string.
  */
 const getMenu = async (_: Request, res: Response) => {
-  const menu = await MenuItem.findAll();
+  const menu = await prisma.menuItem.findMany();
   res.json({ menu });
 };
 
@@ -25,8 +25,12 @@ const getMenu = async (_: Request, res: Response) => {
  *         description: Returns an array of orders.
  */
 const getOrders = async (_: Request, res: Response) => {
-  const orders = await Order.findAll();
-
+  const orders = await prisma.order.findMany({
+    where: { status: 'pending' },
+    include: {
+      items: { select: { menuItemId: true, count: true } },
+    }    
+  });
   res.json({ orders });
 };
 
@@ -51,12 +55,13 @@ const getOrders = async (_: Request, res: Response) => {
  *           items:
  *            type: object
  *            properties:
- *             id:
+ *             menuItemId:
  *              type: string
  *              description: One of the menu items' id
- *             quantity:
+ *             count:
  *              type: integer
- *              description: The quantity of the item
+ *              description: The count for the specified item
+ *              example: 2
  *         required:
  *         - table
  *         - customer
@@ -65,18 +70,24 @@ const getOrders = async (_: Request, res: Response) => {
  *       201:
  *         description: An order has been created.
  *       500:
- *         description: Something catastrophic has happened.
+ *         description: Something catastrophic has happened. Check if you're providing a proper menuItemId from /menu.
  */
 const postOrder = async (req: Request, res: Response) => {
-  const payload = req.body;
+  const payload: { table: string, customer: string, items: { menuItemId: string, count: number }[] } = req.body;
   try {
-    const order = await Order.create({
-      ...payload,
-      status: 'pending'
+    const order = await prisma.order.create({
+      data: {
+        table: payload.table,
+        customer: payload.customer,
+        items: {
+          create: payload.items
+        },
+      },
     });
 
     res.status(201).json({ order });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ err });
   }
 };

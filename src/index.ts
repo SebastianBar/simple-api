@@ -2,13 +2,18 @@ import express from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
+import { PrismaClient } from '@prisma/client'
 
 import { wrapRoutes } from './routes.js';
-import { sequelize } from './db/sequelize.js';
-import { seedMenuItems } from './db/seeder.js'; 
 
 // creates a new express server
 const app = express();
+
+// disable the 'x-powered-by' header
+app.disable('x-powered-by');
+
+// initialize the orm
+const prisma = new PrismaClient()
 
 // Creates a Swagger specification for our routes, generated from the functions' comments
 const swaggerSpec = swaggerJSDoc({
@@ -47,15 +52,16 @@ wrapRoutes(app);
 const port = process.env.PORT || 3000;
 const server = app.listen(port, async () => {
   console.log(`🚀 Running on http://localhost:${port}`);
-  await sequelize.sync();
-  await seedMenuItems();
+  await prisma.$connect();
 });
 
 // when the server is shutting down, we want this function to run
-const gracefulShutdown = () => {
+const gracefulShutdown = async () => {
   console.info('Shutdown signal received! Gracefully shutting down ...');
+  await prisma.$disconnect();
+  console.info('Database connections are now down! Shutting down Express...');
   server.close(() => {
-    console.info('Server is now down. Goodbye! 👋🏻');
+    console.info('Express is now down. Goodbye! 👋🏻');
     process.exit(0);
   });
 };
