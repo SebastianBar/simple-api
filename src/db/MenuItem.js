@@ -1,28 +1,28 @@
-import { DataTypes } from "sequelize";
+import Sequelize, { Model } from "@sequelize/core";
 import { sequelize } from "./index.js";
 
-const MenuItem = sequelize.define("MenuItem", {
-  // Model attributes are defined here
+class MenuItem extends Model {}
+MenuItem.init({
   title: {
-    type: DataTypes.STRING,
+    type: Sequelize.STRING,
     allowNull: false
   },
   img: {
-    type: DataTypes.STRING,
+    type: Sequelize.STRING,
     allowNull: false
   },
   description: {
-    type: DataTypes.STRING,
+    type: Sequelize.STRING,
     allowNull: false
   },
   price: {
-    type: DataTypes.FLOAT,
+    type: Sequelize.FLOAT,
     allowNull: false
   },
   type: {
-    type: DataTypes.STRING,
+    type: Sequelize.STRING,
     allowNull: false
   }
-});
+}, { sequelize })
 
 export default MenuItem;

@@ -1,25 +1,25 @@
-import { DataTypes } from "sequelize";
+import Sequelize, { Model } from "@sequelize/core";
 import { sequelize } from "./index.js";
 
-const Order = sequelize.define("Order", {
-  // Model attributes are defined here
+class Order extends Model {}
+Order.init({
   table: {
-    type: DataTypes.STRING,
+    type: Sequelize.STRING,
     allowNull: false
   },
   customer: {
-    type: DataTypes.STRING,
+    type: Sequelize.STRING,
     allowNull: false
   },
   items: {
-    type: DataTypes.JSON,
+    type: Sequelize.JSON,
     allowNull: false
   },
   status: {
-    type: DataTypes.STRING,
+    type: Sequelize.STRING,
     allowNull: false,
     defaultValue: "pending"
   }
-});
+}, { sequelize })
 
 export default Order;
