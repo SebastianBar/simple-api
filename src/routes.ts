@@ -1,6 +1,5 @@
-import menu from './db/menuData.js';
-import Order from './db/Order.js';
-import MenuItem from './db/MenuItem.js';
+import type { Express, Request, Response } from 'express';
+import { Order, MenuItem } from './db/sequelize.js';
 
 /**
  * @openapi
@@ -11,7 +10,7 @@ import MenuItem from './db/MenuItem.js';
  *       200:
  *         description: Returns a mysterious string.
  */
-const getMenu = async (req, res) => {
+const getMenu = async (_: Request, res: Response) => {
   const menu = await MenuItem.findAll();
   res.json({ menu });
 };
@@ -25,7 +24,7 @@ const getMenu = async (req, res) => {
  *       200:
  *         description: Returns an array of orders.
  */
-const getOrders = async (_, res) => {
+const getOrders = async (_: Request, res: Response) => {
   const orders = await Order.findAll();
 
   res.json({ orders });
@@ -68,7 +67,7 @@ const getOrders = async (_, res) => {
  *       500:
  *         description: Something catastrophic has happened.
  */
-const postOrder = async (req, res) => {
+const postOrder = async (req: Request, res: Response) => {
   const payload = req.body;
   try {
     const order = await Order.create({
@@ -82,7 +81,7 @@ const postOrder = async (req, res) => {
   }
 };
 
-export const wrapRoutes = (express) => {
+export const wrapRoutes = (express: Express) => {
   express.get('/menu', getMenu);
   express.get('/orders', getOrders);
   express.post('/orders', postOrder);

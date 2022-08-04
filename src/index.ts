@@ -4,7 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
 
 import { wrapRoutes } from './routes.js';
-import { sequelize } from './db/index.js';
+import { sequelize } from './db/sequelize.js';
 import { seedMenuItems } from './db/seeder.js'; 
 
 // creates a new express server
@@ -19,7 +19,7 @@ const swaggerSpec = swaggerJSDoc({
       version: '1.0.0',
     },
   },
-  apis: ['./src/routes.js']
+  apis: ['./src/routes.ts', './dist/routes.js']
 });
 
 // allow express to receive json payloads
@@ -44,17 +44,18 @@ app.get('/', (_, res) => {
 wrapRoutes(app);
 
 // boot the server up
-const server = app.listen(3000, async () => {
-  console.log('listening on port 3000');
+const port = process.env.PORT || 3000;
+const server = app.listen(port, async () => {
+  console.log(`🚀 Running on http://localhost:${port}`);
   await sequelize.sync();
   await seedMenuItems();
 });
 
 // when the server is shutting down, we want this function to run
 const gracefulShutdown = () => {
-  console.info('shutdown signal received, shutting down gracefully');
+  console.info('Shutdown signal received! Gracefully shutting down ...');
   server.close(() => {
-    console.info('server has been shutdown');
+    console.info('Server is now down. Goodbye! 👋🏻');
     process.exit(0);
   });
 };

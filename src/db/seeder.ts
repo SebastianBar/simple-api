@@ -1,4 +1,4 @@
-import MenuItem from "./MenuItem.js";
+import { MenuItem } from "./sequelize.js";
 import menuData from "./menuData.js";
 
 export const seedMenuItems = async () => {
