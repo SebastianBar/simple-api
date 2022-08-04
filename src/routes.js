@@ -1,5 +1,6 @@
-import menu from './menu.js';
+import menu from './db/menuData.js';
 import Order from './db/Order.js';
+import MenuItem from './db/MenuItem.js';
 
 /**
  * @openapi
@@ -10,7 +11,8 @@ import Order from './db/Order.js';
  *       200:
  *         description: Returns a mysterious string.
  */
-const getMenu = (_, res) => {
+const getMenu = async (req, res) => {
+  const menu = await MenuItem.findAll();
   res.json({ menu });
 };
 
