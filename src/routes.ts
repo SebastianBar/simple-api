@@ -1,5 +1,50 @@
 import type { Express, Request, Response } from 'express';
 import { prisma } from './db/prisma.js';
+import { compare } from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+/**
+ * @openapi
+ * /login:
+ *   post:
+ *     description: Authenticates a user.
+ *     requestBody:
+ *      content:
+ *       application/json:
+ *        schema:
+ *         properties:
+ *          email:
+ *           type: string
+ *           description: The user's email
+ *           example: ali@berhayat.com
+ *          password:
+ *           type: string
+ *           description: The user's password
+ *           example: My$up3rP@ssw0rd
+ *         required:
+ *         - email
+ *         - password
+ *     responses:
+ *       200:
+ *         description: A JSON Web Token (JWT) is returned.
+ *       401:
+ *         description: Either the email or password is incorrect.
+ */
+const postLogin = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const user = await prisma.user.findFirst({ where: { email } });
+  if (!user) {
+    res.status(401).json({ token: null, message: 'Invalid email or password' });
+    return;
+  }
+  const isValid = await compare(password, user.password);
+  if (!isValid) {
+    res.status(401).json({ token: null, message: 'Invalid email or password' });
+    return;
+  }
+  const token = await jwt.sign({ id: user.id }, process.env.SIGNATURE_KEY || '123', { expiresIn: '1d' });
+  res.json({ token, message: null });
+}
 
 /**
  * @openapi
@@ -93,6 +138,7 @@ const postOrder = async (req: Request, res: Response) => {
 };
 
 export const wrapRoutes = (express: Express) => {
+  express.post('/login', postLogin);
   express.get('/menu', getMenu);
   express.get('/orders', getOrders);
   express.post('/orders', postOrder);
