@@ -1,8 +1,9 @@
 import type { Express, Request, Response } from 'express';
 import { prisma } from './db/prisma.js';
-import { compare, hash } from 'bcrypt';
+import pkg from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+const { compare, hash } = pkg;
 const sign = (object: any) => jwt.sign(object, process.env.SIGNATURE_KEY || '123', { expiresIn: '1d' });
 
 /**
