@@ -1,7 +1,9 @@
 import type { Express, Request, Response } from 'express';
 import { prisma } from './db/prisma.js';
-import { compare } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import jwt from 'jsonwebtoken';
+
+const sign = (object: any) => jwt.sign(object, process.env.SIGNATURE_KEY || '123', { expiresIn: '1d' });
 
 /**
  * @openapi
@@ -42,7 +44,61 @@ const postLogin = async (req: Request, res: Response) => {
     res.status(401).json({ token: null, message: 'Invalid email or password' });
     return;
   }
-  const token = await jwt.sign({ id: user.id }, process.env.SIGNATURE_KEY || '123', { expiresIn: '1d' });
+  const token = await sign({ id: user.id });
+  res.json({ token, message: null });
+}
+
+/**
+ * @openapi
+ * /register:
+ *   post:
+ *     description: Registers a new user.
+ *     requestBody:
+ *      content:
+ *       application/json:
+ *        schema:
+ *         properties:
+ *          name:
+ *           type: string
+ *           description: The user's name
+ *           example: Ali Befa
+ *          email:
+ *           type: string
+ *           description: The user's email
+ *           example: ali@berhayat.com
+ *          password:
+ *           type: string
+ *           description: The user's password
+ *           example: My$up3rP@ssw0rd
+ *         required:
+ *         - name
+ *         - email
+ *         - password
+ *     responses:
+ *       200:
+ *         description: A JSON Web Token (JWT) is returned.
+ *       401:
+ *         description: Email already exists.
+ */
+ const postRegister = async (req: Request, res: Response) => {
+  const { name, email, password } = req.body;
+
+  const user = await prisma.user.findFirst({ where: { email } });
+  if (user) {
+    res.status(401).json({ token: null, message: 'Email already exists' });
+    return;
+  }
+
+  const hashedPassword = await hash(password, 10);
+  const newUser = await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+    },
+  });
+
+  const token = await sign({ id: newUser.id });
   res.json({ token, message: null });
 }
 
@@ -132,13 +188,13 @@ const postOrder = async (req: Request, res: Response) => {
 
     res.status(201).json({ order });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ err });
   }
 };
 
 export const wrapRoutes = (express: Express) => {
   express.post('/login', postLogin);
+  express.post('/register', postRegister);
   express.get('/menu', getMenu);
   express.get('/orders', getOrders);
   express.post('/orders', postOrder);
