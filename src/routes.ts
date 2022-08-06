@@ -13,6 +13,12 @@ const sign = (object: any) => jwt.sign(object, process.env.SIGNATURE_KEY || '123
  *     description: Account related operations
  *   - name: restaurant
  *     description: Restaurant related operations
+ * components:
+ *  securitySchemes:
+ *   bearerAuth:
+ *    type: http
+ *    scheme: bearer
+ *    bearerFormat: JWT
  */
 
 /**
@@ -126,6 +132,8 @@ const postLogin = async (req: Request, res: Response) => {
  *     responses:
  *       200:
  *         description: Returns a mysterious string.
+ *     security:
+ *         - bearerAuth: []
  */
 const getMenu = async (_: Request, res: Response) => {
   const menu = await prisma.menuItem.findMany();
@@ -162,6 +170,8 @@ const getMenu = async (_: Request, res: Response) => {
  *     responses:
  *       200:
  *         description: Returns an array of orders.
+ *     security:
+ *         - bearerAuth: []
  */
 const getOrders = async (req: Request, res: Response) => {
   const { status, includeItems } = req.query;
@@ -215,6 +225,8 @@ const getOrders = async (req: Request, res: Response) => {
  *         description: An order has been created.
  *       500:
  *         description: Something catastrophic has happened. Check if you're providing a proper menuItemId from /menu.
+ *     security:
+ *         - bearerAuth: []
  */
 const postOrder = async (req: Request, res: Response) => {
   const payload: { table: string, customer: string, items: { menuItemId: string, count: number }[] } = req.body;
