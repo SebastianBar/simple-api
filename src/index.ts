@@ -38,7 +38,7 @@ app.use(cors({
 }));
 
 // expose the Swagger UI docs
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customSiteTitle: 'Burger Queen API Docs' }));
 
 // redirect root request into Swagger UI docs
 app.get('/', (_, res) => {

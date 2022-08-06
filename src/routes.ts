@@ -8,8 +8,19 @@ const sign = (object: any) => jwt.sign(object, process.env.SIGNATURE_KEY || '123
 
 /**
  * @openapi
+ * tags:
+ *   - name: account
+ *     description: Account related operations
+ *   - name: restaurant
+ *     description: Restaurant related operations
+ */
+
+/**
+ * @openapi
  * /login:
  *   post:
+ *     tags:
+ *      - account
  *     description: Authenticates a user.
  *     requestBody:
  *      content:
@@ -53,6 +64,8 @@ const postLogin = async (req: Request, res: Response) => {
  * @openapi
  * /register:
  *   post:
+ *     tags:
+ *      - account
  *     description: Registers a new user.
  *     requestBody:
  *      content:
@@ -107,6 +120,8 @@ const postLogin = async (req: Request, res: Response) => {
  * @openapi
  * /menu:
  *   get:
+ *     tags:
+ *      - restaurant
  *     description: Returns the restaurant's menu.
  *     responses:
  *       200:
@@ -121,17 +136,42 @@ const getMenu = async (_: Request, res: Response) => {
  * @openapi
  * /orders:
  *   get:
+ *     tags:
+ *      - restaurant
  *     description: List all orders
+ *     parameters:
+ *        - name: status
+ *          in: query
+ *          description: Status values that need to be considered for filter
+ *          required: false
+ *          explode: true
+ *          schema:
+ *            type: string
+ *            default: pending
+ *            enum:
+ *              - pending
+ *              - completed
+ *        - name: includeItems
+ *          in: query
+ *          description: If the return value should include the items' details
+ *          required: false
+ *          explode: false
+ *          schema:
+ *            type: boolean
+ *            default: false
  *     responses:
  *       200:
  *         description: Returns an array of orders.
  */
-const getOrders = async (_: Request, res: Response) => {
+const getOrders = async (req: Request, res: Response) => {
+  const { status, includeItems } = req.query;
+
   const orders = await prisma.order.findMany({
-    where: { status: 'pending' },
+    where: { status: status as string || 'pending' },
     include: {
-      items: { select: { menuItemId: true, count: true } },
-    }    
+      items: { select: { menuItemId: true, count: true, menuItem: !!includeItems && includeItems === 'true' } },
+    },
+    orderBy: { createdAt: 'asc' },
   });
   res.json({ orders });
 };
@@ -140,6 +180,8 @@ const getOrders = async (_: Request, res: Response) => {
  * @openapi
  * /orders:
  *   post:
+ *     tags:
+ *      - restaurant
  *     description: Creates a new order
  *     requestBody:
  *      content:
