@@ -6,6 +6,30 @@ import jwt from 'jsonwebtoken';
 const { compare, hash } = pkg;
 const sign = (object: any) => jwt.sign(object, process.env.SIGNATURE_KEY || '123', { expiresIn: '1d' });
 
+const authMiddleware = (role?: string) => async (req: Request, res: Response, next: Function) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    res.status(401).send({ message: 'No token provided' });
+    return;
+  };
+  try {
+    const { id } = jwt.verify(token, process.env.SIGNATURE_KEY || '123') as { id: string };
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      res.status(401).send({ message: 'No token provided' });
+      return;
+    }
+    if (role && user.role !== role) {
+      res.status(401).send({ message: "Your account is not allowed to access this resource" });
+      return;
+    }
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(401).send({ message: 'Invalid token' });
+  }
+}
+
 /**
  * @openapi
  * tags:
@@ -57,7 +81,7 @@ const postLogin = async (req: Request, res: Response) => {
     res.status(401).json({ token: null, message: 'Invalid email or password' });
     return;
   }
-  const isValid = await compare(password, user.password);
+  const isValid = await compare(password, user.passwordHash);
   if (!isValid) {
     res.status(401).json({ token: null, message: 'Invalid email or password' });
     return;
@@ -90,18 +114,30 @@ const postLogin = async (req: Request, res: Response) => {
  *           type: string
  *           description: The user's password
  *           example: My$up3rP@ssw0rd
+ *          role:
+ *           type: string
+ *           description: The user's role (waiter or chef)
+ *           example: waiter
  *         required:
  *         - name
  *         - email
  *         - password
+ *         - role
  *     responses:
  *       200:
  *         description: A JSON Web Token (JWT) is returned.
+ *       400:
+ *         description: Invalid payload values provided. Check the documentation for the payload schema.
  *       401:
- *         description: Email already exists.
+ *         description: Email already exists. Please choose another email.
  */
  const postRegister = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
+
+  if(!['waiter', 'chef'].includes(role)) {
+    res.status(400).json({ message: "Invalid role. Allowed roles are 'waiter' and 'chef'" });
+    return;
+  }
 
   const user = await prisma.user.findFirst({ where: { email } });
   if (user) {
@@ -109,12 +145,13 @@ const postLogin = async (req: Request, res: Response) => {
     return;
   }
 
-  const hashedPassword = await hash(password, 10);
+  const passwordHash = await hash(password, 10);
   const newUser = await prisma.user.create({
     data: {
       name,
       email,
-      password: hashedPassword,
+      passwordHash,
+      role
     },
   });
 
