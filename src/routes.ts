@@ -282,10 +282,64 @@ const postOrder = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @openapi
+ * /orders/{id}:
+ *   put:
+ *     tags:
+ *      - restaurant
+ *     description: Updates an existing order
+ *     parameters:
+ *        - name: id
+ *          in: path
+ *          description: The id of the order to be updated
+ *          required: true
+ *          explode: false
+ *          schema:
+ *            type: number
+ *            default: 1
+ *     requestBody:
+ *      content:
+ *       application/json:
+ *        schema:
+ *         properties:
+ *          status:
+ *           type: string
+ *           description: The new status for the order
+ *           example: completed
+ *         required:
+ *         - status
+ *     responses:
+ *       200:
+ *         description: An order has been updated.
+ *     security:
+ *         - bearerAuth: []
+ */
+const putOrder = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!['pending', 'completed'].includes(status)) {
+    res.status(400).json({ message: "Invalid status. Allowed statuses are 'pending' and 'completed'" });
+    return;
+  }
+
+  try {
+    const order = await prisma.order.update({
+      where: { id: Number.parseInt(id, 10) },
+      data: { status },
+    });
+    res.json({ order });
+  } catch (err) {
+    res.status(500).json({ message: (err as any).meta.cause });
+  }
+};
+
 export default (express: Express) => {
   express.post('/login', postLogin);
   express.post('/register', postRegister);
   express.get('/menu', getMenu);
   express.get('/orders', getOrders);
   express.post('/orders', postOrder);
+  express.put('/orders/:id', putOrder);
 };
