@@ -33,7 +33,7 @@ app.use(express.json());
 // allow development environments to connect to the server
 // NOTE: allowing localhost is a security risk and should be removed once in production
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://10.0.0.167:5173'],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
 
