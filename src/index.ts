@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-import { wrapRoutes } from './routes.js';
+import wrapRoutes from './routes.js';
 
 // creates a new express server
 const app = express();
@@ -13,18 +13,18 @@ const app = express();
 app.disable('x-powered-by');
 
 // initialize the orm
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 // Creates a Swagger specification for our routes, generated from the functions' comments
 const swaggerSpec = swaggerJSDoc({
   definition: {
-    openapi: '3.0.0',
+    openapi: '3.0.3',
     info: {
       title: 'Burger Queen API',
       version: '1.0.0',
     },
   },
-  apis: ['./src/routes.ts', './dist/routes.js']
+  apis: ['./src/routes.ts', './dist/routes.js'],
 });
 
 // allow express to receive json payloads
@@ -34,7 +34,7 @@ app.use(express.json());
 // NOTE: allowing localhost is a security risk and should be removed once in production
 app.use(cors({
   origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
 
 // expose the Swagger UI docs

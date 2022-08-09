@@ -1,26 +1,22 @@
 import type { Express, Request, Response } from 'express';
-import { prisma } from './db/prisma.js';
 import pkg from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import prisma from './db/prisma.js';
 
 const { compare, hash } = pkg;
 const sign = (object: any) => jwt.sign(object, process.env.SIGNATURE_KEY || '123', { expiresIn: '1d' });
 
+// eslint-disable-next-line no-unused-vars
 const authMiddleware = (role?: string) => async (req: Request, res: Response, next: Function) => {
   const token = req.headers.authorization;
   if (!token) {
     res.status(401).send({ message: 'No token provided' });
     return;
-  };
+  }
   try {
-    const { id } = jwt.verify(token, process.env.SIGNATURE_KEY || '123') as { id: string };
-    const user = await prisma.user.findUnique({ where: { id } });
-    if (!user) {
-      res.status(401).send({ message: 'No token provided' });
-      return;
-    }
+    const user = jwt.verify(token, process.env.SIGNATURE_KEY || '123') as { id: string, role: string };
     if (role && user.role !== role) {
-      res.status(401).send({ message: "Your account is not allowed to access this resource" });
+      res.status(401).send({ message: 'Your account is not allowed to access this resource' });
       return;
     }
     req.user = user;
@@ -28,7 +24,7 @@ const authMiddleware = (role?: string) => async (req: Request, res: Response, ne
   } catch (error) {
     res.status(401).send({ message: 'Invalid token' });
   }
-}
+};
 
 /**
  * @openapi
@@ -86,9 +82,9 @@ const postLogin = async (req: Request, res: Response) => {
     res.status(401).json({ token: null, message: 'Invalid email or password' });
     return;
   }
-  const token = await sign({ id: user.id });
+  const token = await sign({ id: user.id, role: user.role });
   res.json({ token, message: null });
-}
+};
 
 /**
  * @openapi
@@ -131,10 +127,12 @@ const postLogin = async (req: Request, res: Response) => {
  *       401:
  *         description: Email already exists. Please choose another email.
  */
- const postRegister = async (req: Request, res: Response) => {
-  const { name, email, password, role } = req.body;
+const postRegister = async (req: Request, res: Response) => {
+  const {
+    name, email, password, role,
+  } = req.body;
 
-  if(!['waiter', 'chef'].includes(role)) {
+  if (!['waiter', 'chef'].includes(role)) {
     res.status(400).json({ message: "Invalid role. Allowed roles are 'waiter' and 'chef'" });
     return;
   }
@@ -151,13 +149,13 @@ const postLogin = async (req: Request, res: Response) => {
       name,
       email,
       passwordHash,
-      role
+      role,
     },
   });
 
-  const token = await sign({ id: newUser.id });
+  const token = await sign({ id: newUser.id, role });
   res.json({ token, message: null });
-}
+};
 
 /**
  * @openapi
@@ -273,7 +271,7 @@ const postOrder = async (req: Request, res: Response) => {
         table: payload.table,
         customer: payload.customer,
         items: {
-          create: payload.items
+          create: payload.items,
         },
       },
     });
@@ -284,10 +282,10 @@ const postOrder = async (req: Request, res: Response) => {
   }
 };
 
-export const wrapRoutes = (express: Express) => {
+export default (express: Express) => {
   express.post('/login', postLogin);
   express.post('/register', postRegister);
   express.get('/menu', getMenu);
   express.get('/orders', getOrders);
   express.post('/orders', postOrder);
-}
+};

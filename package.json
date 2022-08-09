@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node --loader ts-node/esm/transpile-only src/index.ts",
+    "lint": "eslint --ext=js,ts .",
     "prebuild": "rimraf dist",
     "build": "tsc"
   },
@@ -21,7 +22,7 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "sqlite3": "^5.0.11",
-    "swagger-jsdoc": "^6.2.4",
+    "swagger-jsdoc": "^6.2.5",
     "swagger-ui-express": "^4.5.0"
   },
   "devDependencies": {
@@ -31,6 +32,11 @@
     "@types/passport-jwt": "^3.0.6",
     "@types/swagger-jsdoc": "^6.0.1",
     "@types/swagger-ui-express": "^4.1.3",
+    "@typescript-eslint/eslint-plugin": "^5.33.0",
+    "@typescript-eslint/parser": "^5.33.0",
+    "eslint": "^8.21.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
     "prisma": "^4.1.1",
     "rimraf": "^3.0.2",
     "ts-node": "^10.9.1",

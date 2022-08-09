@@ -1,20 +1,20 @@
-import { PrismaClient } from '@prisma/client'
-import menuData from '../../src/db/menuData.js'
+import { PrismaClient } from '@prisma/client';
+import menuData from '../../src/db/menuData.js';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-  for await (const item of menuData) {
-    const record = await prisma.menuItem.create({ data: item })
-    console.log({ record })
-  }
+  const promises = menuData.map(async (item) => prisma.menuItem.create({
+    data: item,
+  }));
+  await Promise.all(promises);
 }
 
 try {
-  await main()
-  await prisma.$disconnect()
+  await main();
+  await prisma.$disconnect();
 } catch (e) {
-  console.error(e)
-  await prisma.$disconnect()
-  process.exit(1)
+  console.error(e);
+  await prisma.$disconnect();
+  process.exit(1);
 }

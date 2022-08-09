@@ -1,5 +1,5 @@
 import Passport from 'passport';
-import jwtStrategy from  './jwtStrategy.js';
+import jwtStrategy from './jwtStrategy.js';
 
 const passport = Passport.use(jwtStrategy);
 

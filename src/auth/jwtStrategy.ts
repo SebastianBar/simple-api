@@ -1,5 +1,5 @@
 import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
 type TokenContents = {
   id: string;
