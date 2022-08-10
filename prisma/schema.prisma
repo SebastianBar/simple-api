@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:../sqlite.db"
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -31,11 +31,12 @@ model MenuItem {
 }
 
 model Order {
-  id        Int                @id @default(autoincrement())
+  id        Int                @id @default(sequence())
   table     String
   customer  String
   status    String             @default("pending")
   items     MenuItemsInOrder[]
+  visible   Boolean            @default(true)
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
 }
