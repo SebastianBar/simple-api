@@ -181,7 +181,7 @@ const getMenu = async (_: Request, res: Response) => {
  *   get:
  *     tags:
  *      - restaurant
- *     description: List all orders
+ *     description: List all orders for the restaurant. Note that this endpoint only returns visible orders.
  *     parameters:
  *        - name: status
  *          in: query
@@ -212,12 +212,13 @@ const getOrders = async (req: Request, res: Response) => {
   const { status, includeItems } = req.query;
 
   const orders = await prisma.order.findMany({
-    where: { status: status as string || 'pending' },
+    where: { status: status as string || 'pending', visible: true },
     include: {
       items: { select: { menuItemId: true, count: true, menuItem: !!includeItems && includeItems === 'true' } },
     },
     orderBy: { createdAt: 'asc' },
   });
+
   res.json({ orders });
 };
 
@@ -278,6 +279,7 @@ const postOrder = async (req: Request, res: Response) => {
 
     res.status(201).json({ order });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ err });
   }
 };
@@ -307,17 +309,33 @@ const postOrder = async (req: Request, res: Response) => {
  *           type: string
  *           description: The new status for the order
  *           example: completed
- *         required:
- *         - status
+ *          visible:
+ *           type: boolean
+ *           description: If the order should be visible when listing orders
+ *           example: true
  *     responses:
  *       200:
  *         description: An order has been updated.
+ *       400:
+ *         description: You fucked up something.
+ *       500:
+ *         description: I fucked up something.
  *     security:
  *         - bearerAuth: []
  */
 const putOrder = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, visible } = req.body;
+
+  const data = {
+    status: typeof status === 'string' ? status : undefined,
+    visible: typeof visible === 'boolean' ? visible : undefined,
+  };
+
+  if (Object.values(data).every((v) => v === undefined)) {
+    res.status(400).json({ message: 'No data to update' });
+    return;
+  }
 
   if (!['pending', 'completed'].includes(status)) {
     res.status(400).json({ message: "Invalid status. Allowed statuses are 'pending' and 'completed'" });
@@ -327,10 +345,11 @@ const putOrder = async (req: Request, res: Response) => {
   try {
     const order = await prisma.order.update({
       where: { id: Number.parseInt(id, 10) },
-      data: { status },
+      data,
     });
     res.json({ order });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error });
   }
 };
