@@ -330,8 +330,8 @@ const putOrder = async (req: Request, res: Response) => {
       data: { status },
     });
     res.json({ order });
-  } catch (err) {
-    res.status(500).json({ message: (err as any).meta.cause });
+  } catch (error) {
+    res.status(500).json({ error });
   }
 };
 
