@@ -12,8 +12,13 @@ const authMiddleware = (role?: string) => async (req: Request, res: Response, ne
     res.status(401).send({ message: 'No token provided' });
     return;
   }
+  if (!token.startsWith('Bearer ')) {
+    res.status(401).send({ message: 'Invalid token' });
+    return;
+  }
+
   try {
-    const user = jwt.verify(token, process.env.SIGNATURE_KEY || '123') as { id: string, role: string };
+    const user = jwt.verify(token.substring(7), process.env.SIGNATURE_KEY || '123') as { id: string, role: string };
     if (role && user.role !== role) {
       res.status(401).send({ message: 'Your account is not allowed to access this resource' });
       return;
@@ -21,7 +26,7 @@ const authMiddleware = (role?: string) => async (req: Request, res: Response, ne
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).send({ message: 'Invalid token' });
+    res.status(500).send({ message: 'Something went wrong' });
   }
 };
 
