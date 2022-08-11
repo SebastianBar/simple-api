@@ -341,7 +341,7 @@ const putOrder = async (req: Request, res: Response) => {
     return;
   }
 
-  if (!['pending', 'completed'].includes(status)) {
+  if (typeof data.status === 'string' && !['pending', 'completed'].includes(data.status)) {
     res.status(400).json({ message: "Invalid status. Allowed statuses are 'pending' and 'completed'" });
     return;
   }

@@ -35,7 +35,7 @@ app.use(express.json());
 
 // custom middleware to print the user's IP address
 app.use((req, _, next) => {
-  console.log(`${req.ip} - ${req.method} - ${req.path}`);
+  console.log(`[${new Date().toISOString()}] ${req.ip} ${req.method} ${req.url}`);
   next();
 });
 
