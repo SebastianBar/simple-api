@@ -12,6 +12,9 @@ const app = express();
 // disable the 'x-powered-by' header
 app.disable('x-powered-by');
 
+// to consider cloudflare as proxy
+app.enable('trust proxy');
+
 // initialize the orm
 const prisma = new PrismaClient();
 
@@ -29,6 +32,12 @@ const swaggerSpec = swaggerJSDoc({
 
 // allow express to receive json payloads
 app.use(express.json());
+
+// custom middleware to print the user's IP address
+app.use((req, _, next) => {
+  console.log(`${req.ip} - ${req.method} - ${req.path}`);
+  next();
+});
 
 // allow development environments to connect to the server
 // NOTE: allowing localhost is a security risk and should be removed once in production

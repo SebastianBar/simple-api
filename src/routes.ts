@@ -6,7 +6,6 @@ import prisma from './db/prisma.js';
 const { compare, hash } = pkg;
 const sign = (object: any) => jwt.sign(object, process.env.SIGNATURE_KEY || '123', { expiresIn: '1d' });
 
-// eslint-disable-next-line no-unused-vars
 const authMiddleware = (role?: string) => async (req: Request, res: Response, next: Function) => {
   const token = req.headers.authorization;
   if (!token) {
@@ -357,8 +356,8 @@ const putOrder = async (req: Request, res: Response) => {
 export default (express: Express) => {
   express.post('/login', postLogin);
   express.post('/register', postRegister);
-  express.get('/menu', getMenu);
-  express.get('/orders', getOrders);
-  express.post('/orders', postOrder);
-  express.put('/orders/:id', putOrder);
+  express.get('/menu', authMiddleware(), getMenu);
+  express.get('/orders', authMiddleware(), getOrders);
+  express.post('/orders', authMiddleware('waiter'), postOrder);
+  express.put('/orders/:id', authMiddleware(), putOrder);
 };
