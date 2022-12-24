@@ -4,3 +4,6 @@ node_modules
 Dockerfile
 package-lock.json
 *.db
+.git
+dist
+.env*

@@ -1,6 +1,4 @@
 FROM node:18-alpine AS base
-RUN export NODE_ENV=production
-RUN apk -U --no-cache upgrade
 WORKDIR /app
 COPY package.json tsconfig.json .
 
@@ -15,7 +13,10 @@ RUN npm install --omit=dev
 COPY prisma ./prisma
 RUN npx prisma generate
 
-FROM base as production
+FROM node:18-alpine as production
+ENV NODE_ENV=production
+WORKDIR /app
+COPY package.json .
 COPY prisma ./prisma
 COPY --from=production-build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
