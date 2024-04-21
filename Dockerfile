@@ -2,18 +2,18 @@ FROM node:18-alpine AS base
 WORKDIR /app
 COPY package.json tsconfig.json .
 
-FROM base as build
+FROM base AS build
 RUN npm install
 COPY . .
 RUN npx prisma generate
 RUN npm run build
 
-FROM base as production-build
+FROM base AS production-build
 RUN npm install --omit=dev
 COPY prisma ./prisma
 RUN npx prisma generate
 
-FROM node:18-alpine as production
+FROM node:18-alpine AS production
 ENV NODE_ENV=production
 WORKDIR /app
 COPY package.json .
